@@ -1,0 +1,10 @@
+# You can use this file to create a conda environment for this pipeline:
+#   conda env create -f environment.yml
+name: gff2db-service
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - nodejs=14.14.0
+  - freetype=2.10.4

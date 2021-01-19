@@ -1,0 +1,22 @@
+# Everything needed in production
+
+# Libraries
+biopython==1.78
+cloudant==2.14.0
+
+# Flask
+Flask==1.1.2
+MarkupSafe==1.1.1
+Werkzeug==1.0.1
+Jinja2==2.11.2
+itsdangerous==1.1.0
+Click==7.1.2
+
+# Deployment
+gunicorn>=20.0.4
+
+# Webpack
+Flask-Manage-Webpack==1.4.1
+
+# Debug toolbar
+Flask-DebugToolbar==0.11.0
