@@ -1,7 +1,7 @@
 # Everything needed in production
 
 # Libraries
-biopython==1.78
+bcbio-gff==0.6.6
 cloudant==2.14.0
 
 # Flask
