@@ -10,19 +10,19 @@ def main(argv):
     if len(sys.argv) < 1:
         sys.exit()
 
-	gff_file = sys.argv[1]
+    gff_file = sys.argv[1]
 
-	try:
+    try:
         configfile = sys.argv[2]
-	except IndexError:
-		configfile = "config.json"
+    except IndexError:
+    	configfile = "config.json"
 
-	with open(configfile) as json_data_file:
+    with open(configfile) as json_data_file:
         data = json.load(json_data_file)
 
     conn = dict()
 
-	if "dbserver" in data:
+    if "dbserver" in data:
         if "type" in data["dbserver"]:
         		conn["type"] = data["dbserver"]["type"]
         if "db" in data["dbserver"]:
@@ -39,16 +39,39 @@ def main(argv):
     client = CouchDB(conn["user"], conn["password"], url=conn["host"], connect=True)
 
     database = client[conn['db']]
-    if ! database.exists() :
+    if not database.exists() :
         database = client.create_database(conn['db'])
 
 
     # TODO: Process GFF here
+
     gff_handle = open(gff_file)
-    for rec in GFF.parse(gff_handle):
-        print(rec)
+
+    gene_store = {}
+
+    limit_info = dict(gff_type=["gene", "lnc_RNA", "mRNA", "miRNA", "ncRNA",
+    "ncRNA_gene", "pseudogene", "pseudogenic_transcript", "rRNA", "scRNA", "snRNA",
+    "snoRNA", "tRNA"])
+
+    iter = 0
+    for rec in GFF.parse(gff_handle, target_lines=1000, limit_info=limit_info):
+        features = rec.features
+        for feature in features:
+            #print(feature)
+            print(feature.id)
+            print(feature.type)
+            location = feature.location
+            start = location.start
+            end = location.end
+            strand = location.strand
+            print( "%d, %d, %d" % ( start, end, strand ) )
+            print(feature.qualifiers)
+        iter = iter + 1
+        if iter > 20 :
+            break
     gff_handle.close()
 
+    doc_set = []
     database.bulk_docs( doc_set );
 
 if __name__ == "__main__":
