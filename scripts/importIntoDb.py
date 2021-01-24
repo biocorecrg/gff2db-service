@@ -30,7 +30,12 @@ def main(argv):
     gff_file = sys.argv[1]
 
     try:
-        configfile = sys.argv[2]
+        mol = sys.argv[2]
+    except IndexError:
+        mol = "gene"
+
+    try:
+        configfile = sys.argv[3]
     except IndexError:
     	configfile = "config.json"
 
@@ -63,16 +68,19 @@ def main(argv):
 
     gene_store = {}
 
-    limit_info = dict(gff_type=["gene", "lnc_RNA", "mRNA", "miRNA", "ncRNA",
-    "ncRNA_gene", "pseudogene", "pseudogenic_transcript", "rRNA", "scRNA", "snRNA",
-    "snoRNA", "tRNA"])
+    limit_info = {}
+    limit_info["gene"] = dict(gff_type=["gene", "ncRNA_gene", "pseudogene"])
+    limit_info["transcript"] = dict(gff_type=[ "lnc_RNA", "mRNA", "miRNA", "ncRNA", "pseudogenic_transcript", "rRNA", "scRNA", "snRNA", "snoRNA", "tRNA"])
 
     iter = 0
     docbatch = []
-    for rec in GFF.parse(gff_handle, target_lines=1000, limit_info=limit_info):
+    for rec in GFF.parse(gff_handle, target_lines=1000, limit_info=limit_info[mol]):
         features = rec.features
+
         for feature in features:
 
+            if feature.type not in limit_info[mol]["gff_type"]:
+                continue
             location = feature.location
             # print( dir( location.start ) )
             start = location.start.position
@@ -100,6 +108,7 @@ def main(argv):
         if iter > 100 :
             # Process Dock docbatch
             database.bulk_docs( docbatch )
+            exit()
             docbatch = []
 
     gff_handle.close()
