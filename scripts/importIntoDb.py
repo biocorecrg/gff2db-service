@@ -5,6 +5,23 @@ from BCBio import GFF
 import json
 import pprint
 
+def addQualifiers(doc, qualifiers):
+
+    for qualifier in qualifiers:
+
+        value = qualifiers[qualifier][0]
+
+        if qualifier == "id" or qualifier == "parent" :
+            parts = value.split(":")
+            if len( parts ) > 1 :
+                value = parts[1]
+
+        if value.isdigit():
+            value = int( value )
+        doc[qualifier.lower()] = value
+
+    return doc
+
 def main(argv):
 
     if len(sys.argv) < 1:
@@ -42,9 +59,6 @@ def main(argv):
     if not database.exists() :
         database = client.create_database(conn['db'])
 
-
-    # TODO: Process GFF here
-
     gff_handle = open(gff_file)
 
     gene_store = {}
@@ -54,25 +68,44 @@ def main(argv):
     "snoRNA", "tRNA"])
 
     iter = 0
+    docbatch = []
     for rec in GFF.parse(gff_handle, target_lines=1000, limit_info=limit_info):
         features = rec.features
         for feature in features:
-            #print(feature)
-            print(feature.id)
-            print(feature.type)
+
             location = feature.location
-            start = location.start
-            end = location.end
+            # print( dir( location.start ) )
+            start = location.start.position
+            end = location.end.position
             strand = location.strand
-            print( "%d, %d, %d" % ( start, end, strand ) )
-            print(feature.qualifiers)
+
+            final_id = feature.id
+            parts_id = feature.id.split(":")
+            if len( parts_id ) > 1:
+                final_id = parts_id[1]
+
+            doc = {
+                "_id": final_id,
+                "type": feature.type,
+                "chro": rec.id,
+                "start": start,
+                "end": end,
+                "strand": strand
+            }
+
+            doc = addQualifiers( doc, feature.qualifiers )
+            docbatch.append( doc )
+
         iter = iter + 1
-        if iter > 20 :
-            break
+        if iter > 100 :
+            # Process Dock docbatch
+            database.bulk_docs( docbatch )
+            docbatch =
+
     gff_handle.close()
 
-    doc_set = []
-    database.bulk_docs( doc_set );
+    database.bulk_docs( docbatch )
+    docbatch = []
 
 if __name__ == "__main__":
 	main(sys.argv[1:])
