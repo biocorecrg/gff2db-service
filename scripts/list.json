@@ -1,17 +1,13 @@
 {
    "_id": "_design/list",
    "views": {
-       "class": {
-           "map": "function(doc) {\n  if ( doc.class ) {\n  \temit(doc.class, 1);\n  }\n}",
+       "type": {
+           "map": "function(doc) {\n  if ( doc.type ) {\n  \temit(doc.type, 1);\n  }\n}",
            "reduce": "_count"
        },
        "genome": {
            "map": "function(doc) {\n  if ( doc.genome ) {\n  \temit(doc.genome, 1);\n  }\n}",
            "reduce": "_count"
-       },
-       "classgenome": {
-         "map": "function(doc) {\n  if ( doc.class && doc.genome ) {\n  \temit([doc.class, doc.genome], 1);\n  }\n}",
-         "reduce": "_count"
        }
    }
 }
