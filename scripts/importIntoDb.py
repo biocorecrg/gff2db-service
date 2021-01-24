@@ -100,7 +100,7 @@ def main(argv):
         if iter > 100 :
             # Process Dock docbatch
             database.bulk_docs( docbatch )
-            docbatch =
+            docbatch = []
 
     gff_handle.close()
 

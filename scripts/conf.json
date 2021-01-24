@@ -1,0 +1,9 @@
+{
+  "dbserver": {
+    "type": "couchdb"
+    "db": "gff",
+    "user": "admin",
+    "password": "mypassword",
+    "host": "localhost:5984"
+  }
+}
