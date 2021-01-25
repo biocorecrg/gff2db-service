@@ -4,6 +4,7 @@ from cloudant.client import CouchDB
 from BCBio import GFF
 import json
 import pprint
+import time
 
 def addQualifiers(doc, qualifiers):
 
@@ -22,6 +23,31 @@ def addQualifiers(doc, qualifiers):
 
     return doc
 
+def createDoc( feature, rec ):
+
+    location = feature.location
+    start = location.start.position
+    end = location.end.position
+    strand = location.strand
+
+    final_id = feature.id
+    parts_id = feature.id.split(":")
+    if len( parts_id ) > 1:
+        final_id = parts_id[1]
+
+    doc = {
+        "_id": final_id,
+        "type": feature.type,
+        "chro": rec.id,
+        "start": start,
+        "end": end,
+        "strand": strand
+    }
+
+    doc = addQualifiers( doc, feature.qualifiers )
+
+    return doc
+
 def main(argv):
 
     if len(sys.argv) < 1:
@@ -32,7 +58,7 @@ def main(argv):
     try:
         mol = sys.argv[2]
     except IndexError:
-        mol = "gene"
+        mol = "all"
 
     try:
         configfile = sys.argv[3]
@@ -71,6 +97,8 @@ def main(argv):
     limit_info = {}
     limit_info["gene"] = dict(gff_type=["gene", "ncRNA_gene", "pseudogene"])
     limit_info["transcript"] = dict(gff_type=[ "lnc_RNA", "mRNA", "miRNA", "ncRNA", "pseudogenic_transcript", "rRNA", "scRNA", "snRNA", "snoRNA", "tRNA"])
+    limit_info["all"] = dict(gff_type=["gene", "ncRNA_gene", "pseudogene", "lnc_RNA", "mRNA", "miRNA", "ncRNA", "pseudogenic_transcript", "rRNA", "scRNA", "snRNA", "snoRNA", "tRNA"])
+
 
     iter = 0
     docbatch = []
@@ -81,34 +109,30 @@ def main(argv):
 
             if feature.type not in limit_info[mol]["gff_type"]:
                 continue
-            location = feature.location
-            # print( dir( location.start ) )
-            start = location.start.position
-            end = location.end.position
-            strand = location.strand
-
-            final_id = feature.id
-            parts_id = feature.id.split(":")
-            if len( parts_id ) > 1:
-                final_id = parts_id[1]
-
-            doc = {
-                "_id": final_id,
-                "type": feature.type,
-                "chro": rec.id,
-                "start": start,
-                "end": end,
-                "strand": strand
-            }
-
-            doc = addQualifiers( doc, feature.qualifiers )
+            doc = createDoc( feature, rec )
             docbatch.append( doc )
+            print( doc )
+            iter = iter + 1
 
-        iter = iter + 1
+
+            subfeatures = feature.sub_features
+            for subfeature in subfeatures:
+
+                if subfeature.type not in limit_info[mol]["gff_type"]:
+                    continue
+
+                doc = createDoc( subfeature, rec )
+                print( doc )
+                docbatch.append( doc )
+                iter = iter + 1
+
+
         if iter > 100 :
             # Process Dock docbatch
             database.bulk_docs( docbatch )
+            time.sleep(1)
             docbatch = []
+            iter = 0
 
     gff_handle.close()
 
