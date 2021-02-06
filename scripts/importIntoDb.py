@@ -102,8 +102,8 @@ def main(argv):
 
     limit_info = {}
     limit_info["gene"] = dict(gff_type=["gene", "ncRNA_gene", "pseudogene"])
-    limit_info["transcript"] = dict(gff_type=[ "lnc_RNA", "mRNA", "miRNA", "ncRNA", "pseudogenic_transcript", "rRNA", "scRNA", "snRNA", "snoRNA", "tRNA"])
-    limit_info["all"] = dict(gff_type=["gene", "ncRNA_gene", "pseudogene", "lnc_RNA", "mRNA", "miRNA", "ncRNA", "pseudogenic_transcript", "rRNA", "scRNA", "snRNA", "snoRNA", "tRNA"])
+    limit_info["transcript"] = dict(gff_type=[ "lnc_RNA", "mRNA", "miRNA", "ncRNA", "pseudogenic_transcript", "rRNA", "scRNA", "snRNA", "snoRNA", "tRNA", "trasncript"])
+    limit_info["all"] = dict(gff_type=["gene", "ncRNA_gene", "pseudogene", "lnc_RNA", "mRNA", "miRNA", "ncRNA", "pseudogenic_transcript", "rRNA", "scRNA", "snRNA", "snoRNA", "tRNA", "transcript"])
 
 
     iter = 0
