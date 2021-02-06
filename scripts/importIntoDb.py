@@ -139,7 +139,9 @@ def main(argv):
             # Process Dock docbatch
             database.bulk_docs(docbatch)
             print(docbatch)
-            time.sleep(10)
+            with open('dump.json', 'w', encoding='utf-8') as f:
+                json.dump(docbatch, f, ensure_ascii=False, indent=4)
+            time.sleep(5)
             docbatch = []
             iter = 0
 
