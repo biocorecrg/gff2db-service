@@ -133,7 +133,7 @@ def main(argv):
                 iter = iter + 1
 
 
-        if iter > 100 :
+        if iter > 50 :
             # Process Dock docbatch
             database.bulk_docs( docbatch )
             time.sleep(1)
