@@ -123,7 +123,6 @@ def main(argv):
                 continue
             doc = createDoc(feature, rec, genome)
             docbatch.append(doc)
-            print(doc)
             iter = iter + 1
 
             subfeatures = feature.sub_features
@@ -133,14 +132,14 @@ def main(argv):
                     continue
 
                 doc = createDoc(subfeature, rec, genome)
-                print(doc)
                 docbatch.append(doc)
                 iter = iter + 1
 
         if iter > 100:
             # Process Dock docbatch
             database.bulk_docs(docbatch)
-            time.sleep(1)
+            print(docbatch)
+            time.sleep(10)
             docbatch = []
             iter = 0
 
