@@ -6,24 +6,26 @@ import json
 import pprint
 import time
 
+
 def addQualifiers(doc, qualifiers):
 
     for qualifier in qualifiers:
 
         value = qualifiers[qualifier][0]
 
-        if qualifier == "id" or qualifier == "parent" :
+        if qualifier == "id" or qualifier == "parent":
             parts = value.split(":")
-            if len( parts ) > 1 :
+            if len(parts) > 1:
                 value = parts[1]
 
         if value.isdigit():
-            value = int( value )
+            value = int(value)
         doc[qualifier.lower()] = value
 
     return doc
 
-def createDoc( feature, rec, genome ):
+
+def createDoc(feature, rec, genome):
 
     location = feature.location
     start = location.start.position
@@ -32,8 +34,12 @@ def createDoc( feature, rec, genome ):
 
     final_id = feature.id
     parts_id = feature.id.split(":")
-    if len( parts_id ) > 1:
+    if len(parts_id) > 1:
         final_id = parts_id[1]
+
+    versioning = final_id.split(".")
+    if len(versioning) > 1:
+        final_id = versioning[0]
 
     doc = {
         "_id": final_id,
@@ -45,9 +51,10 @@ def createDoc( feature, rec, genome ):
         "genome": genome
     }
 
-    doc = addQualifiers( doc, feature.qualifiers )
+    doc = addQualifiers(doc, feature.qualifiers)
 
     return doc
+
 
 def main(argv):
 
@@ -69,7 +76,7 @@ def main(argv):
     try:
         configfile = sys.argv[4]
     except IndexError:
-    	configfile = "config.json"
+        configfile = "config.json"
 
     with open(configfile) as json_data_file:
         data = json.load(json_data_file)
@@ -93,18 +100,17 @@ def main(argv):
     client = CouchDB(conn["user"], conn["password"], url=conn["host"], connect=True)
 
     database = client[conn['db']]
-    if not database.exists() :
+    if not database.exists():
         database = client.create_database(conn['db'])
 
     gff_handle = open(gff_file)
 
-    gene_store = {}
+    #gene_store = {}
 
     limit_info = {}
     limit_info["gene"] = dict(gff_type=["gene", "ncRNA_gene", "pseudogene"])
     limit_info["transcript"] = dict(gff_type=[ "lnc_RNA", "mRNA", "miRNA", "ncRNA", "pseudogenic_transcript", "rRNA", "scRNA", "snRNA", "snoRNA", "tRNA", "trasncript"])
     limit_info["all"] = dict(gff_type=["gene", "ncRNA_gene", "pseudogene", "lnc_RNA", "mRNA", "miRNA", "ncRNA", "pseudogenic_transcript", "rRNA", "scRNA", "snRNA", "snoRNA", "tRNA", "transcript"])
-
 
     iter = 0
     docbatch = []
@@ -115,11 +121,10 @@ def main(argv):
 
             if feature.type not in limit_info[mol]["gff_type"]:
                 continue
-            doc = createDoc( feature, rec, genome )
-            docbatch.append( doc )
-            print( doc )
+            doc = createDoc(feature, rec, genome)
+            docbatch.append(doc)
+            print(doc)
             iter = iter + 1
-
 
             subfeatures = feature.sub_features
             for subfeature in subfeatures:
@@ -127,23 +132,23 @@ def main(argv):
                 if subfeature.type not in limit_info[mol]["gff_type"]:
                     continue
 
-                doc = createDoc( subfeature, rec, genome )
-                print( doc )
-                docbatch.append( doc )
+                doc = createDoc(subfeature, rec, genome)
+                print(doc)
+                docbatch.append(doc)
                 iter = iter + 1
 
-
-        if iter > 50 :
+        if iter > 100:
             # Process Dock docbatch
-            database.bulk_docs( docbatch )
+            database.bulk_docs(docbatch)
             time.sleep(1)
             docbatch = []
             iter = 0
 
     gff_handle.close()
 
-    database.bulk_docs( docbatch )
+    database.bulk_docs(docbatch)
     docbatch = []
 
+
 if __name__ == "__main__":
-	main(sys.argv[1:])
+    main(sys.argv[1:])
