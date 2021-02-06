@@ -1,15 +1,19 @@
 #!/usr/bin/env bash
 
-DB=${1:-gff}
-USER=${2:-admin}
-PASSWD=${3:-mypassword}
-HOST=${4:-localhost}
-PORT=${5:-5984}
+CONF=${1:-conf.json}
 
-curl -X PUT http://$USER:$PASSWD@$HOST:$PORT/$DB
 
-curl -X PUT -d @auth.json http://$USER:$PASSWD@$HOST:$PORT/$DB/_design/_auth
+DB=$(jq -r '.dbserver.db' $CONF)
+USER=$(jq -r '.dbserver.user' $CONF)
+PASSWORD=$(jq -r '.dbserver.password' $CONF)
+HOST=$(jq -r '.dbserver.host' $CONF)
+hparts=(${HOST//\/\// })
 
-curl -X PUT -d @list.json http://$USER:$PASSWD@$HOST:$PORT/$DB/_design/list
+FINALHOST="${hparts[0]}//$USER:$PASSWORD@${hparts[1]}"
 
-curl -X PUT -d @search.json http://$USER:$PASSWD@$HOST:$PORT/$DB/_design/search
+echo $FINALHOST
+curl -k -X PUT $FINALHOST/$DB
+
+curl -k -X PUT -d @auth.json $FINALHOST/$DB/_design/_auth
+curl -k -X PUT -d @list.json $FINALHOST/$DB/_design/list
+curl -k -X PUT -d @search.json $FINALHOST/$DB/_design/search

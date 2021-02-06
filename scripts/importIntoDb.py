@@ -23,7 +23,7 @@ def addQualifiers(doc, qualifiers):
 
     return doc
 
-def createDoc( feature, rec ):
+def createDoc( feature, rec, genome ):
 
     location = feature.location
     start = location.start.position
@@ -41,7 +41,8 @@ def createDoc( feature, rec ):
         "chro": rec.id,
         "start": start,
         "end": end,
-        "strand": strand
+        "strand": strand,
+        "genome": genome
     }
 
     doc = addQualifiers( doc, feature.qualifiers )
@@ -56,12 +57,17 @@ def main(argv):
     gff_file = sys.argv[1]
 
     try:
-        mol = sys.argv[2]
+        genome = sys.argv[2]
+    except IndexError:
+        genome = "hg38"
+
+    try:
+        mol = sys.argv[3]
     except IndexError:
         mol = "all"
 
     try:
-        configfile = sys.argv[3]
+        configfile = sys.argv[4]
     except IndexError:
     	configfile = "config.json"
 
@@ -109,7 +115,7 @@ def main(argv):
 
             if feature.type not in limit_info[mol]["gff_type"]:
                 continue
-            doc = createDoc( feature, rec )
+            doc = createDoc( feature, rec, genome )
             docbatch.append( doc )
             print( doc )
             iter = iter + 1
