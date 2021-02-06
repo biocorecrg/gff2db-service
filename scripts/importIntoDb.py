@@ -127,7 +127,7 @@ def main(argv):
                 if subfeature.type not in limit_info[mol]["gff_type"]:
                     continue
 
-                doc = createDoc( subfeature, rec )
+                doc = createDoc( subfeature, rec, genome )
                 print( doc )
                 docbatch.append( doc )
                 iter = iter + 1
