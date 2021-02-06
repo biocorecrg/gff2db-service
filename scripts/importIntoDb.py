@@ -11,16 +11,18 @@ def addQualifiers(doc, qualifiers):
 
     for qualifier in qualifiers:
 
-        value = qualifiers[qualifier][0]
+        # To tune depending on debugging
+        if qualifier in ["id", "parent", "gene_name", "source"]:
+            value = qualifiers[qualifier][0]
 
-        if qualifier == "id" or qualifier == "parent":
-            parts = value.split(":")
-            if len(parts) > 1:
-                value = parts[1]
+            if qualifier == "id" or qualifier == "parent":
+                parts = value.split(":")
+                if len(parts) > 1:
+                    value = parts[1]
 
-        if value.isdigit():
-            value = int(value)
-        doc[qualifier.lower()] = value
+            if value.isdigit():
+                value = int(value)
+            doc[qualifier.lower()] = value
 
     return doc
 
@@ -141,7 +143,8 @@ def main(argv):
             with open('dump.json', 'w', encoding='utf-8') as f:
                 json.dump(docbatch, f, ensure_ascii=False, indent=4)
             database.bulk_docs(docbatch)
-            time.sleep(5)
+            time.sleep(2)
+            docbatch.clear()
             docbatch = []
             iter = 0
 
