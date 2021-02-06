@@ -137,10 +137,10 @@ def main(argv):
 
         if iter > 100:
             # Process Dock docbatch
-            database.bulk_docs(docbatch)
             print(docbatch)
             with open('dump.json', 'w', encoding='utf-8') as f:
                 json.dump(docbatch, f, ensure_ascii=False, indent=4)
+            database.bulk_docs(docbatch)
             time.sleep(5)
             docbatch = []
             iter = 0
