@@ -12,17 +12,16 @@ def addQualifiers(doc, qualifiers):
     for qualifier in qualifiers:
 
         # To tune depending on debugging
-        if qualifier in ["id", "parent", "gene_name", "source"]:
-            value = qualifiers[qualifier][0]
+        value = qualifiers[qualifier][0]
 
-            if qualifier == "id" or qualifier == "parent":
-                parts = value.split(":")
-                if len(parts) > 1:
-                    value = parts[1]
+        if qualifier == "id" or qualifier == "parent":
+            parts = value.split(":")
+            if len(parts) > 1:
+                value = parts[1]
 
-            if value.isdigit():
-                value = int(value)
-            doc[qualifier.lower()] = value
+        if value.isdigit():
+            value = int(value)
+        doc[qualifier.lower()] = value
 
     return doc
 
