@@ -6,6 +6,8 @@
             index(\"id\", doc._id, {\"store\":true});
             if ( doc.type ) {      index(\"type\", doc.type, {\"store\":true});    }
             if ( doc.name ) {      index(\"name\", doc.name, {\"store\":true});    }
+            if ( doc.gene_name ) {      index(\"name\", doc.gene_name, {\"store\":true});    }
+            if ( doc.transcript_name ) {      index(\"name\", doc.transcript_name, {\"store\":true});    }      
             if ( doc.description ) {      index(\"description\", doc.description, {\"store\":true});    }
             if ( doc.genome ) {      index(\"genome\", doc.genome, {\"store\":true});    }
             if ( doc.start ) {      index(\"start\", doc.start);    }
