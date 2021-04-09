@@ -142,7 +142,7 @@ def main(argv):
             with open('dump.json', 'w', encoding='utf-8') as f:
                 json.dump(docbatch, f, ensure_ascii=False, indent=4)
             database.bulk_docs(docbatch)
-            time.sleep(2)
+            time.sleep(10)
             docbatch.clear()
             docbatch = []
             iter = 0
