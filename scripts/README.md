@@ -9,6 +9,8 @@ wget -c -t0 ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_36/g
 
 bash prepareDB.sh /home/toniher/Documents/biocouch.json
 
+python importIntoDb.py ./gencode.v36.annotation.gff3.gz hg38 all /home/toniher/Documents/biocouch.json
+
 
 ```
 
